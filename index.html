@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מסע בחלל – לומדה לילדים</title>
+  <style>
+    :root {
+      --navy: #172554;
+      --blue: #2563eb;
+      --sky: #dbeafe;
+      --purple: #7c3aed;
+      --yellow: #facc15;
+      --green: #15803d;
+      --red: #b91c1c;
+      --paper: #f5f7ff;
+      --white: #fff;
+      --muted: #64748b;
+      --border: #d7def0;
+      --shadow: 0 8px 24px rgba(23,37,84,.10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--navy);
+      font-family: Arial, "Arial Hebrew", sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(124,58,237,.10) 0 2px, transparent 3px),
+        radial-gradient(circle at 85% 25%, rgba(37,99,235,.12) 0 2px, transparent 3px),
+        var(--paper);
+      background-size: 90px 90px, 120px 120px, auto;
+    }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 3px;
+    }
+    .topbar {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; max-width:1080px; margin:auto; padding:22px 22px 10px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-icon { font-size:38px; }
+    h1 { margin:0; font-size:clamp(25px,4vw,36px); }
+    .tagline { margin:4px 0 0; color:var(--muted); font-size:15px; }
+    .score-pill {
+      display:flex; align-items:center; gap:8px; background:white;
+      border:1px solid var(--border); border-radius:999px;
+      padding:10px 16px; box-shadow:var(--shadow); font-weight:bold;
+    }
+    main { max-width:1080px; margin:auto; padding:18px 22px 55px; }
+    .welcome {
+      background:linear-gradient(120deg,#172554,#4338ca);
+      color:white; border-radius:26px; padding:30px;
+      display:flex; justify-content:space-between; align-items:center;
+      gap:20px; box-shadow:var(--shadow); overflow:hidden;
+    }
+    .welcome h2 { margin:0 0 8px; font-size:clamp(25px,4vw,34px); }
+    .welcome p { margin:0; color:#dbeafe; font-size:18px; }
+    .welcome-art { font-size:clamp(70px,12vw,112px); }
+    .section-heading { margin:30px 0 16px; display:flex; align-items:end; justify-content:space-between; gap:12px; }
+    .section-heading h2 { margin:0; font-size:25px; }
+    .section-heading p { margin:0; color:var(--muted); }
+    .topic-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; }
+    .topic-card {
+      background:white; border:1px solid var(--border); border-radius:22px;
+      padding:20px; box-shadow:var(--shadow); display:flex; flex-direction:column;
+      min-height:245px; transition:transform .15s, box-shadow .15s;
+    }
+    .topic-card:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(23,37,84,.14); }
+    .topic-icon { width:76px; height:76px; display:grid; place-items:center;
+      background:var(--sky); border-radius:20px; font-size:43px; margin-bottom:13px; }
+    .topic-card h3 { margin:0 0 7px; font-size:22px; }
+    .topic-card p { margin:0 0 18px; color:var(--muted); line-height:1.5; flex:1; }
+    .topic-actions { display:flex; gap:9px; }
+    .btn {
+      border:0; border-radius:12px; padding:12px 17px; font-weight:bold;
+      background:var(--blue); color:white; min-height:44px;
+    }
+    .btn:hover { filter:brightness(.94); }
+    .btn.secondary { background:#eef2ff; color:var(--navy); border:1px solid #c7d2fe; }
+    .btn:disabled { opacity:.45; cursor:not-allowed; }
+    .screen { display:none; }
+    .screen.active { display:block; }
+    .back-row { margin:0 0 16px; }
+    .back-btn { border:1px solid var(--border); border-radius:999px; background:white; padding:9px 16px; color:var(--navy); }
+    .panel {
+      background:white; border:1px solid var(--border); border-radius:24px;
+      padding:clamp(20px,4vw,34px); box-shadow:var(--shadow); text-align:center;
+    }
+    .panel h2 { margin:0 0 8px; font-size:29px; }
+    .panel-intro { color:var(--muted); margin:0 0 22px; }
+    .lesson-visual {
+      width:190px; height:190px; margin:8px auto 18px; border-radius:50%;
+      display:grid; place-items:center; font-size:105px;
+      background:linear-gradient(145deg,#dbeafe,#ede9fe);
+      border:7px solid #f8fafc; box-shadow:0 0 0 2px #c7d2fe;
+    }
+    .lesson-title { font-size:25px; margin:10px 0; }
+    .lesson-description { max-width:650px; margin:0 auto 22px; font-size:19px; line-height:1.7; }
+    .lesson-controls { display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap; }
+    .progress-label { color:var(--muted); margin:18px 0 8px; }
+    .progress-track { max-width:420px; height:10px; background:#e2e8f0; border-radius:20px; margin:0 auto; overflow:hidden; }
+    .progress-fill { height:100%; width:0; background:var(--purple); transition:width .2s; }
+    .question-count { color:var(--muted); margin-bottom:15px; }
+    .question { font-size:25px; font-weight:bold; margin:12px 0 22px; }
+    .answers { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; max-width:620px; margin:0 auto; }
+    .answer {
+      min-height:64px; border:2px solid var(--border); border-radius:15px;
+      background:#f8fafc; color:var(--navy); font-size:19px; font-weight:bold; padding:12px;
+    }
+    .answer:hover:not(:disabled) { border-color:var(--blue); background:#eff6ff; }
+    .answer.correct { border-color:var(--green); background:#dcfce7; color:#14532d; }
+    .answer.incorrect { border-color:var(--red); background:#fee2e2; color:#7f1d1d; }
+    .feedback { min-height:34px; margin:18px 0 8px; font-weight:bold; font-size:19px; }
+    .feedback.good { color:var(--green); }
+    .feedback.bad { color:var(--red); }
+    .result-icon { font-size:85px; }
+    .result-score { font-size:28px; font-weight:bold; margin:12px 0 22px; }
+    .result-actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    footer { text-align:center; color:var(--muted); padding:0 15px 24px; font-size:14px; }
+    @media (max-width:600px) {
+      .topbar { align-items:flex-start; flex-direction:column; }
+      .welcome { padding:22px; }
+      .welcome-art { font-size:68px; }
+      .topic-actions { flex-direction:column; }
+      .answers { grid-template-columns:1fr; }
+      .lesson-visual { width:155px; height:155px; font-size:85px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🚀</span>
+      <div>
+        <h1>מסע בחלל</h1>
+        <p class="tagline">לומדים, מגלים ומשחקים</p>
+      </div>
+    </div>
+    <div class="score-pill" aria-label="ניקוד כולל">
+      <span aria-hidden="true">⭐</span>
+      <span>הכוכבים שלי:</span>
+      <span id="total-stars" data-testid="total-stars">0</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="home-screen" class="screen active" data-testid="home-screen">
+      <div class="welcome">
+        <div>
+          <h2>מוכנים להמריא? 🌟</h2>
+          <p>בואו להכיר את החלל, ללמוד עובדות מעניינות ולבדוק מה כבר גיליתם.</p>
+        </div>
+        <div class="welcome-art" aria-hidden="true">🪐</div>
+      </div>
+
+      <div class="section-heading">
+        <h2>לאן נטוס היום?</h2>
+        <p>בחרו נושא כדי להתחיל</p>
+      </div>
+      <div id="topic-list" class="topic-grid">
+        <article class="topic-card" data-testid="topic-card-planets">
+          <div class="topic-icon" aria-hidden="true">🪐</div>
+          <h3>כוכבי הלכת</h3>
+          <p>נכיר את כוכבי הלכת ונגלה מה מיוחד בכל אחד מהם.</p>
+          <div class="topic-actions">
+            <button class="btn secondary" data-action="learn" data-topic="planets">מתחילים ללמוד</button>
+            <button class="btn" data-action="quiz" data-topic="planets">למשחק</button>
+          </div>
+        </article>
+        <article class="topic-card" data-testid="topic-card-sky">
+          <div class="topic-icon" aria-hidden="true">🌙</div>
+          <h3>השמש, הירח והכוכבים</h3>
+          <p>נלמד על השמש, על הירח ועל מה שרואים בשמי הלילה.</p>
+          <div class="topic-actions">
+            <button class="btn secondary" data-action="learn" data-topic="sky">מתחילים ללמוד</button>
+            <button class="btn" data-action="quiz" data-topic="sky">למשחק</button>
+          </div>
+        </article>
+        <article class="topic-card" data-testid="topic-card-space">
+          <div class="topic-icon" aria-hidden="true">🧑‍🚀</div>
+          <h3>חוקרים בחלל</h3>
+          <p>נכיר חלליות, חליפות חלל ותחנות מחקר מיוחדות.</p>
+          <div class="topic-actions">
+            <button class="btn secondary" data-action="learn" data-topic="space">מתחילים ללמוד</button>
+            <button class="btn" data-action="quiz" data-topic="space">למשחק</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="learn-screen" class="screen" data-testid="learn-screen">
+      <div class="back-row"><button class="back-btn" id="learn-back" data-testid="learn-back">→ חזרה לנושאים</button></div>
+      <div class="panel">
+        <h2 id="learn-topic-title">לומדים על החלל</h2>
+        <p class="panel-intro">קראו את המידע ועברו לשלב הבא.</p>
+        <div class="lesson-visual" id="lesson-icon" data-testid="lesson-icon">🪐</div>
+        <h3 class="lesson-title" id="lesson-title">שם הפריט</h3>
+        <p class="lesson-description" id="lesson-description">כאן יופיע הסבר קצר.</p>
+        <div class="lesson-controls">
+          <button class="btn secondary" id="lesson-prev" data-testid="lesson-prev">הקודם</button>
+          <button class="btn" id="lesson-next" data-testid="lesson-next">הבא</button>
+          <button class="btn" id="start-quiz" data-testid="start-quiz">סיימתי ללמוד – למשחק!</button>
+        </div>
+        <p class="progress-label" id="lesson-progress" data-testid="lesson-progress">פריט 1 מתוך 3</p>
+        <div class="progress-track"><div class="progress-fill" id="lesson-progress-fill"></div></div>
+      </div>
+    </section>
+
+    <section id="quiz-screen" class="screen" data-testid="quiz-screen">
+      <div class="back-row"><button class="back-btn" id="quiz-back" data-testid="quiz-back">→ חזרה לנושאים</button></div>
+      <div class="panel">
+        <h2 id="quiz-topic-title">משחק החלל</h2>
+        <p class="question-count" id="question-count" data-testid="question-count">שאלה 1 מתוך 3</p>
+        <div class="progress-track"><div class="progress-fill" id="quiz-progress-fill"></div></div>
+        <p class="question" id="question-text" data-testid="question-text">השאלה תופיע כאן</p>
+        <div class="answers" id="answer-list" data-testid="answer-list"></div>
+        <p class="feedback" id="quiz-feedback" data-testid="quiz-feedback" aria-live="polite"></p>
+        <button class="btn" id="next-question" data-testid="next-question" hidden>לשאלה הבאה</button>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen" data-testid="result-screen">
+      <div class="panel">
+        <div class="result-icon" id="result-icon" aria-hidden="true">🏆</div>
+        <h2 id="result-title" data-testid="result-title">כל הכבוד!</h2>
+        <p class="result-score" id="result-score" data-testid="result-score">עניתם נכון על 0 מתוך 3</p>
+        <p class="panel-intro" id="result-message">המשיכו ללמוד ולגלות דברים חדשים.</p>
+        <div class="result-actions">
+          <button class="btn" id="play-again" data-testid="play-again">משחק נוסף</button>
+          <button class="btn secondary" id="back-home" data-testid="back-home">חזרה לנושאים</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>מסע בחלל · לומדה לימודית לתרגול ולמידה</footer>
+
+  <script>
+    const lessons = {
+      planets: {
+        title: "כוכבי הלכת",
+        items: [
+          { icon: "☿️", title: "כוכב חמה", text: "כוכב חמה הוא כוכב הלכת הקרוב ביותר לשמש. הוא קטן יחסית, ואין סביבו ירחים." },
+          { icon: "🌍", title: "כדור הארץ", text: "כדור הארץ הוא הבית שלנו. יש בו מים נוזליים, אוויר ויצורים חיים רבים." },
+          { icon: "🔴", title: "מאדים", text: "מאדים נקרא גם הכוכב האדום בגלל צבע הקרקע שלו. חוקרים בודקים אם היו בו מים בעבר." }
+        ],
+        questions: [
+          { q: "איזה כוכב לכת הוא הבית שלנו?", answers: ["מאדים", "כדור הארץ", "כוכב חמה"], correct: 1 },
+          { q: "איזה כוכב לכת מכונה הכוכב האדום?", answers: ["מאדים", "נוגה", "צדק"], correct: 0 },
+          { q: "איזה כוכב לכת נמצא הכי קרוב לשמש?", answers: ["כדור הארץ", "שבתאי", "כוכב חמה"], correct: 2 }
+        ]
+      },
+      sky: {
+        title: "השמש, הירח והכוכבים",
+        items: [
+          { icon: "☀️", title: "השמש", text: "השמש היא כוכב שמאיר ומחמם את כדור הארץ. האור והחום שלה חשובים לחיים." },
+          { icon: "🌙", title: "הירח", text: "הירח הוא לוויין טבעי של כדור הארץ. הוא מקיף את כדור הארץ ואור השמש מוחזר מפניו." },
+          { icon: "✨", title: "כוכבים", text: "כוכבים הם כדורי גז חמים שמפיקים אור בעצמם. השמש שלנו היא גם כוכב." }
+        ],
+        questions: [
+          { q: "מהי השמש?", answers: ["כוכב", "כוכב לכת", "לוויין"], correct: 0 },
+          { q: "מה מקיף את כדור הארץ?", answers: ["השמש", "הירח", "מאדים"], correct: 1 },
+          { q: "האם השמש היא כוכב?", answers: ["לא", "רק בלילה", "כן"], correct: 2 }
+        ]
+      },
+      space: {
+        title: "חוקרים בחלל",
+        items: [
+          { icon: "🚀", title: "חללית", text: "חללית היא כלי שנבנה כדי לנוע בחלל. היא יכולה לשאת ציוד, מכשירים ואסטרונאוטים." },
+          { icon: "🧑‍🚀", title: "אסטרונאוט", text: "אסטרונאוט הוא אדם שעבר הכשרה מיוחדת כדי להשתתף במשימות בחלל." },
+          { icon: "🛰️", title: "לוויין", text: "לוויין מלאכותי הוא מכשיר שנשלח למסלול סביב כדור הארץ או סביב גוף אחר בחלל." }
+        ],
+        questions: [
+          { q: "איך נקרא כלי שנועד לנוע בחלל?", answers: ["צוללת", "חללית", "רכבת"], correct: 1 },
+          { q: "מי משתתף במשימות בחלל?", answers: ["אסטרונאוט", "כבאי", "טבח"], correct: 0 },
+          { q: "מהו לוויין מלאכותי?", answers: ["כוכב טבעי", "ענן", "מכשיר שנשלח למסלול בחלל"], correct: 2 }
+        ]
+      }
+    };
+
+    let currentTopic = "planets";
+    let lessonIndex = 0;
+    let questionIndex = 0;
+    let score = 0;
+    let answered = false;
+    let totalStars = 0;
+
+    const $ = (id) => document.getElementById(id);
+    const showScreen = (screenId) => {
+      document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+      $(screenId).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    const updateStars = () => { $("total-stars").textContent = totalStars; };
+
+    function openLesson(topicId) {
+      currentTopic = topicId;
+      lessonIndex = 0;
+      renderLesson();
+      showScreen("learn-screen");
+    }
+
+    function renderLesson() {
+      const topic = lessons[currentTopic];
+      const item = topic.items[lessonIndex];
+      $("learn-topic-title").textContent = topic.title;
+      $("lesson-icon").textContent = item.icon;
+      $("lesson-title").textContent = item.title;
+      $("lesson-description").textContent = item.text;
+      $("lesson-progress").textContent = `פריט ${lessonIndex + 1} מתוך ${topic.items.length}`;
+      $("lesson-progress-fill").style.width = `${((lessonIndex + 1) / topic.items.length) * 100}%`;
+      $("lesson-prev").disabled = lessonIndex === 0;
+      $("lesson-next").disabled = lessonIndex === topic.items.length - 1;
+    }
+
+    function startQuiz(topicId = currentTopic) {
+      currentTopic = topicId;
+      questionIndex = 0;
+      score = 0;
+      renderQuestion();
+      showScreen("quiz-screen");
+    }
+
+    function renderQuestion() {
+      const topic = lessons[currentTopic];
+      const question = topic.questions[questionIndex];
+      answered = false;
+      $("quiz-topic-title").textContent = `משחק: ${topic.title}`;
+      $("question-count").textContent = `שאלה ${questionIndex + 1} מתוך ${topic.questions.length}`;
+      $("quiz-progress-fill").style.width = `${(questionIndex / topic.questions.length) * 100}%`;
+      $("question-text").textContent = question.q;
+      $("quiz-feedback").textContent = "";
+      $("quiz-feedback").className = "feedback";
+      $("next-question").hidden = true;
+      $("next-question").textContent = questionIndex === topic.questions.length - 1 ? "לתוצאות" : "לשאלה הבאה";
+      $("answer-list").innerHTML = "";
+
+      question.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.textContent = answer;
+        button.dataset.answerIndex = String(index);
+        button.dataset-testid = `answer-${index + 1}`;
+        button.addEventListener("click", () => chooseAnswer(index, button));
+        $("answer-list").appendChild(button);
+      });
+    }
+
+    function chooseAnswer(index, selectedButton) {
+      if (answered) return;
+      answered = true;
+      const question = lessons[currentTopic].questions[questionIndex];
+      const buttons = [...$("answer-list").querySelectorAll("button")];
+      buttons.forEach((button, buttonIndex) => {
+        button.disabled = true;
+        if (buttonIndex === question.correct) button.classList.add("correct");
+      });
+
+      if (index === question.correct) {
+        score++;
+        totalStars++;
+        updateStars();
+        $("quiz-feedback").textContent = "תשובה נכונה! כל הכבוד ⭐";
+        $("quiz-feedback").classList.add("good");
+      } else {
+        selectedButton.classList.add("incorrect");
+        $("quiz-feedback").textContent = `לא בדיוק. התשובה הנכונה היא: ${question.answers[question.correct]}`;
+        $("quiz-feedback").classList.add("bad");
+      }
+      $("next-question").hidden = false;
+    }
+
+    function showResults() {
+      const total = lessons[currentTopic].questions.length;
+      $("result-score").textContent = `עניתם נכון על ${score} מתוך ${total}`;
+      $("result-title").textContent = score === total ? "מדהים! הצלחתם בהכול!" : "כל הכבוד על המאמץ!";
+      $("result-icon").textContent = score === total ? "🏆" : "🌟";
+      $("result-message").textContent = score === total
+        ? "אתם חוקרי חלל מצטיינים. המשיכו לגלות!"
+        : "אפשר לנסות שוב ולשפר את התוצאה.";
+      showScreen("result-screen");
+    }
+
+    document.querySelectorAll("[data-action='learn']").forEach(button => {
+      button.addEventListener("click", () => openLesson(button.dataset.topic));
+    });
+    document.querySelectorAll("[data-action='quiz']").forEach(button => {
+      button.addEventListener("click", () => startQuiz(button.dataset.topic));
+    });
+    $("learn-back").addEventListener("click", () => showScreen("home-screen"));
+    $("quiz-back").addEventListener("click", () => showScreen("home-screen"));
+    $("lesson-prev").addEventListener("click", () => {
+      if (lessonIndex > 0) { lessonIndex--; renderLesson(); }
+    });
+    $("lesson-next").addEventListener("click", () => {
+      if (lessonIndex < lessons[currentTopic].items.length - 1) { lessonIndex++; renderLesson(); }
+    });
+    $("start-quiz").addEventListener("click", () => startQuiz());
+    $("next-question").addEventListener("click", () => {
+      if (questionIndex < lessons[currentTopic].questions.length - 1) {
+        questionIndex++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    });
+    $("play-again").addEventListener("click", () => startQuiz());
+    $("back-home").addEventListener("click", () => showScreen("home-screen"));
+  </script>
+</body>
+</html>
