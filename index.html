@@ -344,7 +344,7 @@
         button.className = "answer";
         button.textContent = answer;
         button.dataset.answerIndex = String(index);
-        button.dataset-testid = `answer-${index + 1}`;
+        button.setAttribute("data-testid", `answer-${index + 1}`);
         button.addEventListener("click", () => chooseAnswer(index, button));
         $("answer-list").appendChild(button);
       });
